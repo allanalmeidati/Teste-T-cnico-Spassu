@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  backend:
+    image: php:8.0-alpine
+    container_name: back-end
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    command: sh -c "docker-php-ext-install mysqli && php -S 0.0.0.0:8000 -t public"
+    restart: unless-stopped
+
+  frontend:
+    image: node:alpine
+    container_name: front-end
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "rm -rf node_modules && npm install && npm run dev"
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    expose:
+      - 5173
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: book
+      MYSQL_USER: book.user
+      MYSQL_PASSWORD: 12345@book
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
