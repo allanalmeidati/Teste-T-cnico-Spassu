@@ -1,20 +1,16 @@
 version: '3'
 
 services:
-
-    ####################################################################################################
-    # PHP
-    ####################################################################################################
     php:
         build: .docker/php
         ports:
             - 5173:5173
         volumes:
             - ./backend:/var/www:cached
+        command: sh -c "composer install &&  php-fpm"
+        depends_on:
+            - composer
 
-    ####################################################################################################
-    # Nginx
-    ####################################################################################################
     nginx:
         image: nginx
         ports:
@@ -58,4 +54,9 @@ services:
         ports:
             - "3306:3306"
 
-
+    composer:
+        image: composer:latest
+        volumes:
+            - ./backend:/var/www
+        command: install
+        working_dir: /var/www

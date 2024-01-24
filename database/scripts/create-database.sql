@@ -36,3 +36,21 @@ CREATE TABLE IF NOT EXISTS Livro_Assunto (
     FOREIGN KEY (Livro_CodL) REFERENCES Livro(CodL),
     FOREIGN KEY (Assunto_CodAs) REFERENCES Assunto(CodAs)
     );
+
+
+INSERT INTO book.Assunto (Descricao) VALUES ('Ciencia-Ficcao');
+INSERT INTO book.Assunto (Descricao) VALUES ('Historia Antiga');
+INSERT INTO book.Assunto (Descricao) VALUES ('Misterio');
+INSERT INTO book.Assunto (Descricao) VALUES ('Autoajuda');
+INSERT INTO book.Assunto (Descricao) VALUES ('Fantasia');
+INSERT INTO book.Assunto (Descricao) VALUES ('Viagens no Tempo');
+INSERT INTO book.Assunto (Descricao) VALUES ('Biografia');
+
+
+
+INSERT INTO book.Autor (Nome) VALUES ('J.K. Rowling');
+INSERT INTO book.Autor (Nome) VALUES ('George Orwell');
+INSERT INTO book.Autor (Nome) VALUES ('Jane Austen');
+INSERT INTO book.Autor (Nome) VALUES ('Haruki Murakami');
+INSERT INTO book.Autor (Nome) VALUES ('Agatha Christie');
+
