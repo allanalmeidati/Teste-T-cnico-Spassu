@@ -1,94 +1,65 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Tests\Feature;
 
 use App\Models\Autor;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
-class AutorController extends Controller
+class AutorControllerTest extends TestCase
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    use RefreshDatabase;
+
+    public function testListarAutores()
     {
-        return Autor::all();
+        $autor1 = Autor::create(['Nome' => 'Autor 1']);
+        $autor2 = Autor::create(['Nome' => 'Autor 2']);
+
+        $response = $this->get('/api/autor');
+
+        $response->assertStatus(200);
+        $response->assertJson([$autor1->toArray(), $autor2->toArray()]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function testCriarAutor()
     {
-        //
+        $data = ['Nome' => 'Novo Autor'];
+
+        $response = $this->post('/api/autor', $data);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('Autores', $data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function testRecuperarAutor()
     {
-        return Autor::create($request->only('Nome'));
+        $autor = Autor::create(['Nome' => 'Autor Teste']);
+
+        $response = $this->get("/api/autor/{$autor->id}");
+
+        $response->assertStatus(200);
+        $response->assertJson(['autor' => $autor->toArray()]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function testAtualizarAutor()
     {
-        $autor = Autor::find($id);
+        $autor = Autor::create(['Nome' => 'Autor Original']);
+        $data = ['Nome' => 'Autor Atualizado'];
 
-        if (!$autor) {
-            return response()->json(['message' => 'Autor não encontrado'], 404);
-        }
+        $response = $this->put("/api/autor/{$autor->id}", $data);
 
-        return response()->json(['autor' => $autor]);
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('autores', $data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function testExcluirAutor()
     {
-        //
-    }
+        $autor = Autor::create(['Nome' => 'Autor Para Exclusão']);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $autor = Autor::findOrFail($id);
-        return $autor->update($request->only('Nome'));
-    }
+        $response = $this->delete("/api/autor/{$autor->id}");
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $assunto = Autor::findOrFail($id);
-        $assunto->delete();
-        return response()->json(['message' => 'Autor excluído com sucesso']);
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('autores', ['id' => $autor->id]);
     }
 }
