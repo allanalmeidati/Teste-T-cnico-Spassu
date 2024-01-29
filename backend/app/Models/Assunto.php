@@ -18,4 +18,11 @@ class Assunto extends Model
     ];
 
 
+    public function livros()
+    {
+        return $this->belongsToMany(Livro::class, 'Livro_Assunto',  'Assunto_CodAs', 'Livro_CodL');
+    }
+
+
+
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Assunto;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AssuntoController extends Controller
 {
@@ -14,17 +15,11 @@ class AssuntoController extends Controller
      */
     public function index()
     {
-        return Assunto::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-
+        try {
+            return Assunto::with('livros')->get();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
     /**
@@ -35,7 +30,11 @@ class AssuntoController extends Controller
      */
     public function store(Request $request)
     {
-        return Assunto::create($request->only('Descricao'));
+        try {
+            return Assunto::create($request->only('Descricao'));
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
     /**
@@ -46,24 +45,14 @@ class AssuntoController extends Controller
      */
     public function show($id)
     {
-        $assunto = Assunto::find($id);
-
-        if (!$assunto) {
-            return response()->json(['message' => 'Livro não encontrado'], 404);
+        try {
+            $assunto = Assunto::findOrFail($id);
+            return response()->json(['assunto' => $assunto]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Assunto não encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
         }
-
-        return response()->json(['assunto' => $assunto]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -75,8 +64,15 @@ class AssuntoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $assunto = Assunto::findOrFail($id);
-        return $assunto->update($request->only('Descricao'));
+        try {
+            $assunto = Assunto::findOrFail($id);
+            $assunto->update($request->only('Descricao'));
+            return response()->json(['message' => 'Assunto atualizado com sucesso']);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Assunto não encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
     /**
@@ -87,9 +83,14 @@ class AssuntoController extends Controller
      */
     public function destroy($id)
     {
-               $assunto = Assunto::findOrFail($id);
-        $assunto->delete();
-
-        return response()->json(['message' => 'Livro excluído com sucesso']);
+        try {
+            $assunto = Assunto::findOrFail($id);
+            $assunto->delete();
+            return response()->json(['message' => 'Assunto excluído com sucesso']);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Assunto não encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 }

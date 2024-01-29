@@ -1,65 +1,98 @@
 <?php
 
-namespace Tests\Feature;
+namespace App\Http\Controllers;
 
 use App\Models\Autor;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class AutorControllerTest extends TestCase
+class AutorController extends Controller
 {
-    use RefreshDatabase;
-
-    public function testListarAutores()
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
     {
-        $autor1 = Autor::create(['Nome' => 'Autor 1']);
-        $autor2 = Autor::create(['Nome' => 'Autor 2']);
-
-        $response = $this->get('/api/autor');
-
-        $response->assertStatus(200);
-        $response->assertJson([$autor1->toArray(), $autor2->toArray()]);
+        try {
+            return Autor::with('livros')->get();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
-    public function testCriarAutor()
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
     {
-        $data = ['Nome' => 'Novo Autor'];
-
-        $response = $this->post('/api/autor', $data);
-
-        $response->assertStatus(201);
-        $this->assertDatabaseHas('Autores', $data);
+        try {
+            return Autor::create($request->only('Nome'));
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
-    public function testRecuperarAutor()
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
     {
-        $autor = Autor::create(['Nome' => 'Autor Teste']);
-
-        $response = $this->get("/api/autor/{$autor->id}");
-
-        $response->assertStatus(200);
-        $response->assertJson(['autor' => $autor->toArray()]);
+        try {
+            $autor = Autor::findOrFail($id);
+            return response()->json(['autor' => $autor]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Autor não encontrado!'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
-    public function testAtualizarAutor()
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
     {
-        $autor = Autor::create(['Nome' => 'Autor Original']);
-        $data = ['Nome' => 'Autor Atualizado'];
-
-        $response = $this->put("/api/autor/{$autor->id}", $data);
-
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('autores', $data);
+        try {
+            $autor = Autor::findOrFail($id);
+            $autor->update($request->only('Nome'));
+            return response()->json(['message' => 'Autor atualizado com sucesso']);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Autor não encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 
-    public function testExcluirAutor()
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
     {
-        $autor = Autor::create(['Nome' => 'Autor Para Exclusão']);
-
-        $response = $this->delete("/api/autor/{$autor->id}");
-
-        $response->assertStatus(200);
-        $this->assertDatabaseMissing('autores', ['id' => $autor->id]);
+        try {
+            $autor = Autor::findOrFail($id);
+            $autor->delete();
+            return response()->json(['message' => 'Autor excluído com sucesso']);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Autor não encontrado'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'ocorreu um erro'], 500);
+        }
     }
 }
