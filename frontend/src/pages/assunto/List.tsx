@@ -102,7 +102,7 @@ const Assunto = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete">
-                    <IconButton color="error" onClick={() => deleteAction(row.original)}>
+                    <IconButton color="error" onClick={() => deleteAction(row.original)} disabled={row?.original?.livros?.length}>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>

@@ -54,3 +54,20 @@ INSERT INTO book.Autor (Nome) VALUES ('Jane Austen');
 INSERT INTO book.Autor (Nome) VALUES ('Haruki Murakami');
 INSERT INTO book.Autor (Nome) VALUES ('Agatha Christie');
 
+
+CREATE OR REPLACE VIEW ViewLivro AS
+SELECT
+    Livro.CodL,
+    Livro.Titulo,
+    Livro.Editora,
+    Livro.Edicao,
+    Livro.AnoPublicacao,
+    Livro.Valor,
+    GROUP_CONCAT(Autor.Nome) AS Autores,
+    GROUP_CONCAT(Assunto.Descricao) AS Assuntos
+FROM Livro
+         LEFT JOIN Livro_Autor ON Livro.CodL = Livro_Autor.Livro_CodL
+         LEFT JOIN Autor ON Livro_Autor.Autor_CodAu = Autor.CodAu
+         LEFT JOIN Livro_Assunto ON Livro.CodL = Livro_Assunto.Livro_CodL
+         LEFT JOIN Assunto ON Livro_Assunto.Assunto_CodAs = Assunto.CodAs
+GROUP BY Livro.CodL;

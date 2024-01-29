@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import DeleteDialog from "./DeleteDialog.tsx";
 import {Navbar} from "react-bootstrap";
 import Container from "react-bootstrap/Container";
+import {formatarNumeroParaReal} from "../../utils/formats.tsx";
 const Livro = () => {
     const [validationErrors, setValidationErrors] = useState<
         Record<string, string | undefined>
@@ -51,76 +52,67 @@ const Livro = () => {
                 accessorKey: 'CodL',
                 header: 'CodL',
                 enableEditing: false,
-                size: 80,
+                size: 10,
             },
             {
                 accessorKey: 'Titulo',
                 header: 'Titulo',
-                muiEditTextFieldProps: {
-                    required: true,
-                    error: !!validationErrors?.firstName,
-                    helperText: validationErrors?.firstName,
-                    //remove any previous validation errors when user focuses on the input
-                    onFocus: () =>
-                        setValidationErrors({
-                            ...validationErrors,
-                            firstName: undefined,
-                        }),
-                    //optionally add validation checking for onBlur or onChange
-                },
+                size: 10,
+
             },
             {
                 accessorKey: 'Editora',
                 header: 'Editora',
-                muiEditTextFieldProps: {
-                    required: true,
-                    error: !!validationErrors?.lastName,
-                    helperText: validationErrors?.lastName,
-                    //remove any previous validation errors when user focuses on the input
-                    onFocus: () =>
-                        setValidationErrors({
-                            ...validationErrors,
-                            lastName: undefined,
-                        }),
-                },
+                size: 10,
+
             },
             {
                 accessorKey: 'Edicao',
                 header: 'Edicao',
-                muiEditTextFieldProps: {
-                    type: 'email',
-                    required: true,
-                    error: !!validationErrors?.email,
-                    helperText: validationErrors?.email,
-                    //remove any previous validation errors when user focuses on the input
-                    onFocus: () =>
-                        setValidationErrors({
-                            ...validationErrors,
-                            email: undefined,
-                        }),
-                },
+                size: 10,
+                Cell: ({ renderedCellValue, row }) => (
+                    <>
+                        { <p>{ row.original.Edicao} º</p> }
+                    </>
+                ),
             },
             {
                 accessorKey: 'AnoPublicacao',
-                header: 'AnoPublicacao',
+                header: 'Ano',
                 editVariant: 'select',
-                // editSelectOptions: usStates,
-                muiEditTextFieldProps: {
-                    select: true,
-                    error: !!validationErrors?.state,
-                    helperText: validationErrors?.state,
-                },
+                size: 10,
+
             },
             {
                 accessorKey: 'Valor',
                 header: 'Valor',
                 editVariant: 'select',
-                // editSelectOptions: usStates,
-                muiEditTextFieldProps: {
-                    select: true,
-                    error: !!validationErrors?.state,
-                    helperText: validationErrors?.state,
-                },
+                Cell: ({ renderedCellValue, row }) => (
+                    <>
+                        { <p>{ formatarNumeroParaReal(row.original.Valor)}</p> }
+                    </>
+                ),
+
+            },
+            {
+                Autor: 'Autor',
+                header: 'Autor',
+                editVariant: 'select',
+                Cell: ({ renderedCellValue, row }) => (
+                    <>
+                        { row.original.autores.map(a => <p>{a.Nome}</p>) }
+                    </>
+                ),
+            },
+            {
+                Autor: 'Assunto',
+                header: 'Assunto',
+                editVariant: 'select',
+                Cell: ({ renderedCellValue, row }) => (
+                    <>
+                        { row.original.assuntos.map(a => <p>{a.Descricao}</p>) }
+                    </>
+                ),
             },
         ],
         [validationErrors],

@@ -180,11 +180,20 @@ function FormLivro() {
                             control={control}
                             rules={{
                                 required: 'O campo [Valor] é obrigatório',
+                                validate: function(value) {
+                                    const isFloat = /^\d+(\.\d+)?$/.test(value);
+                                    if (!isFloat) {
+                                        return 'O campo [Valor] deve ser numérico';
+                                    }
+                                    return undefined;
+                                }
                             }}
+
+
                             render={({field: {onChange, value}}) => (
                                 <Form.Group as={Col} controlId="formGridEdicao">
                                     <Form.Label>Valor</Form.Label>
-                                    <Form.Control type="number" placeholder="Valor" onChange={onChange} value={value}/>
+                                    <Form.Control type="text" placeholder="Valor" onChange={onChange} value={value}/>
                                 </Form.Group>
                             )}
                             name="Valor"

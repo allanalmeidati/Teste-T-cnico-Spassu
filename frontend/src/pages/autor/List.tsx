@@ -92,6 +92,7 @@ const Autor = () => {
 
 
         renderRowActions: ({ row, table }) => {
+
             return (
             <Box sx={{ display: 'flex', gap: '1rem' }}>
                 <Tooltip title="Edit">
@@ -102,13 +103,13 @@ const Autor = () => {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete">
-                    <IconButton color="error" onClick={() => deleteAction(row.original)}>
+                    <IconButton color="error" onClick={() => deleteAction(row.original)} disabled={row?.original?.livros?.length}>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
             </Box>
         )},
-        renderTopToolbarCustomActions: ({ table }) => (
+        renderTopToolbarCustomActions: () => (
             <Button
                 variant="primary"
                 size={'sm'}
